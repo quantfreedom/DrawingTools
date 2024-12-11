@@ -1,0 +1,46 @@
+<Window xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:vm="using:DrawingTools.ViewModels"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+		x:Class="DrawingTools.Views.MainWindow"
+		x:DataType="vm:MainViewModel"
+		Title="DrawingTools"
+		xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia">
+
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
+			 to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+		<vm:MainViewModel/>
+	</Design.DataContext>
+	<Grid
+		ColumnDefinitions="Auto,*"
+		RowDefinitions="Auto,*"
+		Margin="5">
+
+		<StackPanel
+			Orientation="Horizontal"
+			Grid.Row="0"
+			Grid.ColumnSpan="10"
+			Spacing="10"
+			Margin="0 0 0 10">
+			<Button Content="Clear"/>
+		</StackPanel>
+
+		<StackPanel
+			Grid.Row="1"
+			Grid.Column="0"
+			Spacing="10">
+			<Button Content="Line"/>
+			<Button Content="Rect"/>
+		</StackPanel>
+
+
+		<ScottPlot:AvaPlot
+			Grid.Column="1"
+			Grid.Row="1"
+			Name="AvaPlot1"/>
+	</Grid>
+
+</Window>
