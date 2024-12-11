@@ -1,9 +1,21 @@
-﻿namespace DrawingTools.ViewModels
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ScottPlot.Avalonia;
+
+namespace DrawingTools.ViewModels;
+
+public partial class MainViewModel:ViewModelBase
 {
-    public partial class MainViewModel : ViewModelBase
+    public AvaPlot AvaPlot1 { get; set; } = new AvaPlot();
+    public MainViewModel()
     {
-#pragma warning disable CA1822 // Mark members as static
-        public string Greeting => "Welcome to Avalonia!";
-#pragma warning restore CA1822 // Mark members as static
+       
+    }
+
+
+
+    [RelayCommand]
+    private void AddLine()
+    {
     }
 }
