@@ -1,5 +1,7 @@
 ﻿using Avalonia.Threading;
 using Binance.Net.Clients;
+using CommunityToolkit.Mvvm.Input;
+using DrawingTools.ScottPlotExtensions;
 using ScottPlot;
 using ScottPlot.Avalonia;
 using System;
@@ -14,7 +16,15 @@ public partial class MainViewModel : ViewModelBase
 {
     private AvaPlot _plot;
     private BinanceSocketClient _binanceClient = new BinanceSocketClient();
-    
+    private bool _drawingRectangleMode = false;
+    public MainViewModel()
+    {
+        StartDrawingRectCommand = new RelayCommand(() =>
+        {
+            _drawingRectangleMode = true;
+        });
+    }
+
     public async Task FillTheChart()
     {
         var request = await _binanceClient.SpotApi.ExchangeData.GetUIKlinesAsync("BTCUSDT", Binance.Net.Enums.KlineInterval.OneHour, limit: 2000);
@@ -46,7 +56,25 @@ public partial class MainViewModel : ViewModelBase
         set
         {
             _plot = value;
+            _plot.PointerPressed += this.Plot_PointerPressed;
         }
     }
-  
+
+    public RelayCommand StartDrawingRectCommand { get; set; }
+     
+    private void Plot_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {   
+        var plot = sender as AvaPlot;
+        var points = e.GetPosition(plot);
+
+        Pixel mousePixel = new(points.X, points.Y);
+        Coordinates mouseLocation = plot.Plot.GetCoordinates(mousePixel);
+
+        if (_drawingRectangleMode)
+        {
+            plot!.StartDrawingDragableRectangle(mouseLocation.X, mouseLocation.Y);
+
+            _drawingRectangleMode = false;
+        }  
+    }
 }
