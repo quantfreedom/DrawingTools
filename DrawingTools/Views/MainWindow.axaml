@@ -33,8 +33,9 @@
 			Grid.Row="1"
 			Grid.Column="0"
 			Spacing="10">
-			<Button Content="Line"/>
-			<Button Content="Rect"/>
+			<Button Content="Rect"
+              Name="btn"
+              />
 		</StackPanel>
 
 
