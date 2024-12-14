@@ -17,7 +17,6 @@ namespace DrawingTools.Views
         {
             var plot = this.Find<AvaPlot>("AvaPlot1");
            
-            var btn = this.Find<Button>("btn");
             (DataContext as MainViewModel)!.PricePlot = plot!.Plot;
             (DataContext as MainViewModel)!.AvaPlot = plot!;
 

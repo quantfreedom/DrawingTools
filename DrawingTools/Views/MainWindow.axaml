@@ -26,7 +26,9 @@
 			Grid.ColumnSpan="10"
 			Spacing="10"
 			Margin="0 0 0 10">
-			<Button Content="Clear"/>
+			<Button
+				Content="Clear"
+				Command="{Binding ClearPlotCommand}"/>
 		</StackPanel>
 
 		<StackPanel
@@ -34,8 +36,10 @@
 			Grid.Column="0"
 			Spacing="10">
 			<Button Content="Rect"
-              Name="btn"
               Command="{Binding StartDrawingRectCommand}"
+              />
+			<Button Content="Line"
+              Command="{Binding StartDrawingTrendLineCommand}"
               />
 		</StackPanel>
 

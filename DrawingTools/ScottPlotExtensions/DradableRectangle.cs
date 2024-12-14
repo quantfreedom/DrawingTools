@@ -95,6 +95,8 @@ public class DradableRectangle
         _anchorBottomLeft.Y = _rect.Y1;
 
         _plot.PointerReleased -= this._plot_PointerReleased;
+        _plot.UserInputProcessor.Reset();
+        _plot.UserInputProcessor.Enable();
     }
 
     private void _plot_PointerMoved(object? sender, Avalonia.Input.PointerEventArgs e)

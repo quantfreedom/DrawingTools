@@ -12,36 +12,39 @@ using System.Threading.Tasks;
 
 namespace DrawingTools.ViewModels;
 
-public partial class MainViewModel : ViewModelBase
+public partial class MainViewModel:ViewModelBase
 {
     private AvaPlot _plot;
-    private BinanceSocketClient _binanceClient = new BinanceSocketClient();
-    private bool _drawingRectangleMode = false;
-    public MainViewModel()
-    {
-        StartDrawingRectCommand = new RelayCommand(() =>
-        {
-            _drawingRectangleMode = true;
-        });
-    }
+    private BinanceSocketClient _binanceClient = new();
+    private string _drawingMode = string.Empty;
 
     public async Task FillTheChart()
     {
-        var request = await _binanceClient.SpotApi.ExchangeData.GetUIKlinesAsync("BTCUSDT", Binance.Net.Enums.KlineInterval.OneHour, limit: 2000);
+        var request = await _binanceClient.SpotApi.ExchangeData
+            .GetUIKlinesAsync("BTCUSDT", Binance.Net.Enums.KlineInterval.OneHour, limit: 2000);
 
         if (request.Success)
-        { 
-            var bars = request.Data.Result.Select(x => new OHLC((double)x.OpenPrice, (double)x.HighPrice, (double)x.LowPrice, (double)x.ClosePrice, x.OpenTime, TimeSpan.FromMinutes(60))).ToArray();
-             
-            List<OHLC> prices = new();
-            var socket = new BinanceSocketClient(); 
+        {
+            var bars = request.Data.Result
+                .Select(x => new OHLC(
+                    (double)x.OpenPrice,
+                    (double)x.HighPrice,
+                    (double)x.LowPrice,
+                    (double)x.ClosePrice,
+                    x.OpenTime,
+                    TimeSpan.FromMinutes(60)
+                    )
+                ).ToArray();
+
+            List<OHLC> prices = [];
+            var socket = new BinanceSocketClient();
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 PricePlot.Add.Candlestick(bars);
                 PricePlot.Axes.DateTimeTicksBottom();
                 PricePlot.PlotControl!.Refresh();
-            }, DispatcherPriority.Background); 
+            }, DispatcherPriority.Background);
         }
         else
         {
@@ -49,7 +52,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ScottPlot.Plot PricePlot { get; set; }   
+    public Plot PricePlot { get; set; }
     public AvaPlot AvaPlot
     {
         get { return _plot; }
@@ -60,21 +63,52 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public RelayCommand StartDrawingRectCommand { get; set; }
-     
+    [RelayCommand]
+    public void ClearPlot()
+    {
+        AvaPlot.Plot.Clear();
+        AvaPlot.Refresh();
+    }
+
+    [RelayCommand]
+    public void StartDrawingRect()
+    {
+        _drawingMode = "Rect";
+    }
+
+    [RelayCommand]
+    public void StartDrawingTrendLine()
+    {
+        _drawingMode = "Trend Line";
+    }
+
     private void Plot_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
-    {   
+    {
         var plot = sender as AvaPlot;
         var points = e.GetPosition(plot);
 
         Pixel mousePixel = new(points.X, points.Y);
-        Coordinates mouseLocation = plot.Plot.GetCoordinates(mousePixel);
+        Coordinates mouseLocation = plot!.Plot.GetCoordinates(mousePixel);
 
-        if (_drawingRectangleMode)
+
+        switch (_drawingMode)
         {
-            plot!.StartDrawingDragableRectangle(mouseLocation.X, mouseLocation.Y);
+            case "Rect":
+                plot.StartDrawingDragableRectangle(mouseLocation.X, mouseLocation.Y);
+                ResetDrawingMode();
+                AvaPlot.UserInputProcessor.Disable();
+                break;
+            case "Trend Line":
+                plot.StartDrawingDragableTrendLine(mouseLocation.X, mouseLocation.Y);
+                ResetDrawingMode();
+                AvaPlot.UserInputProcessor.Disable();
+                break;
+        }
 
-            _drawingRectangleMode = false;
-        }  
+    }
+
+    private void ResetDrawingMode()
+    {
+        _drawingMode = string.Empty;
     }
 }
